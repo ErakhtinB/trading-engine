@@ -21,112 +21,36 @@ int main() {
     boost::asio::io_context ioctx;
 
     binapi::ws::websockets ws{
-         ioctx
+        ioctx
+        // , "testnet.binance.vision"
+        // , "9443"
         ,"stream.binance.com"
         ,"9443"
     };
 
-    ws.part_depth("BTCUSDT", binapi::e_levels::_5, binapi::e_freq::_100ms,
-        [](const char *fl, int ec, std::string emsg, auto depths) {
-            if ( ec ) {
-                std::cerr << "subscribe part_depth error: fl=" << fl << ", ec=" << ec << ", emsg=" << emsg << std::endl;
+    // post buy market order
+	// BinaCPP::send_order( "BNBETH", "BUY", "MARKET", "GTC", 20 , 0,   "",0,0, recvWindow, result );
 
-                return false;
-            }
-
-            std::cout << "part_depths: " << depths << std::endl;
-
-            return true;
-          }
-    );
-
-    ws.diff_depth("BTCUSDT", binapi::e_freq::_100ms,
-        [](const char *fl, int ec, std::string emsg, auto depths) {
-            if ( ec ) {
-                std::cerr << "subscribe diff_depth error: fl=" << fl << ", ec=" << ec << ", emsg=" << emsg << std::endl;
-
-                return false;
-            }
-
-            std::cout << "diff_depths: " << depths << std::endl;
-
-            return true;
-        }
-    );
-
-    ws.trade("BTCUSDT",
-        [](const char *fl, int ec, std::string emsg, auto trades) {
-            if ( ec ) {
-                std::cerr << "subscribe trades error: fl=" << fl << ", ec=" << ec << ", emsg=" << emsg << std::endl;
-
-                return false;
-            }
-
-            std::cout << "trades: " << trades << std::endl;
-
-            return true;
-        }
-    );
-
-    auto book_handler = ws.book("BTCUSDT",
-        [](const char *fl, int ec, std::string emsg, auto book) {
-            if ( ec ) {
+    binapi::ws::websockets::handle book_handler = {};
+    book_handler = ws.book("BNBUSDT",
+        [&book_handler, &ws](const char *fl, int ec, std::string emsg, auto book)
+        {
+            if ( ec )
+            {
                 std::cerr << "subscribe book error: fl=" << fl << ", ec=" << ec << ", emsg=" << emsg << std::endl;
-
                 return false;
             }
-
-            std::cout << "book: " << book << std::endl;
-
+            std::cout << book << std::endl;
             return true;
-        }
-    );
-
-    auto books_handler = ws.books(
-        [](const char *fl, int ec, std::string emsg, auto books) {
-            if ( ec ) {
-                std::cerr << "subscribe books error: fl=" << fl << ", ec=" << ec << ", emsg=" << emsg << std::endl;
-
-                return false;
-            }
-
-            std::cout << "books: " << books << std::endl;
-
-            return true;
-        }
-    );
-
-    ws.mini_tickers(
-        [](const char *fl, int ec, std::string emsg, auto mini_tickers) {
-            if ( ec ) {
-                std::cerr << "subscribe mini_tickers error: fl=" << fl << ", ec=" << ec << ", emsg=" << emsg << std::endl;
-
-                return false;
-            }
-
-            std::cout << "mini_tickers: " << mini_tickers << std::endl;
-
-            return true;
-        }
-    );
-
-    boost::asio::steady_timer timer0{ioctx, std::chrono::steady_clock::now() + std::chrono::seconds(5)};
-    timer0.async_wait([&ws, book_handler](const auto &/*ec*/){
-        std::cout << "unsubscribing book_handler: " << book_handler << std::endl;
-        ws.unsubscribe(book_handler);
-    });
-
-    boost::asio::steady_timer timer1{ioctx, std::chrono::steady_clock::now() + std::chrono::seconds(10)};
-    timer1.async_wait([&ws, books_handler](const auto &/*ec*/){
-        std::cout << "async unsubscribing books_handler: " << books_handler << std::endl;
-        ws.async_unsubscribe(books_handler);
-    });
-
-    boost::asio::steady_timer timer2{ioctx, std::chrono::steady_clock::now() + std::chrono::seconds(15)};
-    timer2.async_wait([&ws](const auto &/*ec*/){
-        std::cout << "async unsubscribing all" << std::endl;
-        ws.async_unsubscribe_all();
-    });
+            // we need b
+            // if ( trashhold)
+            // book["b"], (if we sell)
+            // if (true)
+            // {
+            //     // send
+            //     ws.unsubscribe(book_handler);
+            // }
+        });
 
     ioctx.run();
 

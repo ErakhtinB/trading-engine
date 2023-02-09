@@ -11,7 +11,8 @@ aux_source_directory(binapi/src SRC)
 
 find_package(Boost 1.74 COMPONENTS thread REQUIRED)
 
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 17)
+
 set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
 
 set(SRC ${SRC} src/main.cpp)

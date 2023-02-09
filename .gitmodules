@@ -1,0 +1,3 @@
+[submodule "binapi"]
+	path = binapi
+	url = git@github.com:niXman/binapi.git
